@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f5f7f2">
+  <title>Ports · SoloOne</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar"><a href="/" class="brand" aria-label="SoloOne ports">soloone<span class="brand-dot"></span></a><span class="workspace">NUMBER WORKSPACE</span><span class="view-label"><span class="dot"></span>Shared view</span></header>
+  <main>
+    <section class="heading">
+      <div><p class="eyebrow">YOUR WHATSAPP NUMBERS</p><h1>Port overview.</h1><p class="intro">See what’s free, what’s in use, and what needs attention.</p></div>
+      <div class="refresh-area"><button id="refresh" class="refresh" type="button"><span aria-hidden="true">↻</span> Refresh</button><p id="updated" role="status">Checking current status…</p><span class="auto-note">Updates every minute</span></div>
+    </section>
+    <section class="summary" aria-label="Port overview">
+      <article class="summary-card featured"><div class="summary-label"><span class="dot"></span>Free & connected</div><div class="summary-value" id="count-available">—</div><p>Start with these ports</p></article>
+      <article class="summary-card"><div class="summary-label">In use</div><div class="summary-value" id="count-in-use">—</div><p>Already allocated</p></article>
+      <article class="summary-card"><div class="summary-label">Needs attention</div><div class="summary-value" id="count-attention">—</div><p>Disconnected, blocked or unverified</p></article>
+      <article class="summary-card"><div class="summary-label">All ports</div><div class="summary-value" id="count-all">—</div><p>Your current inventory</p></article>
+    </section>
+    <section class="inventory" aria-labelledby="inventory-title">
+      <div class="inventory-heading"><div><h2 id="inventory-title">Port directory <span id="result-count"></span></h2><p>Most stable first <span class="separator">/</span> Based on recent connection history and activity</p></div><label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="search" type="search" placeholder="Find a port…" aria-label="Find a port" autocomplete="off"></label></div>
+      <div class="filterbar"><fieldset><legend class="sr-only">Availability</legend><span class="filter-label">SHOW</span><label class="filter"><input id="filter-free" type="checkbox" checked>Free</label><label class="filter"><input id="filter-in-use" type="checkbox" checked>In use</label></fieldset><span class="filter-hint">Availability and connection are separate</span></div>
+      <div id="notice" class="notice" role="status" hidden></div>
+      <div class="table-wrap"><table><thead><tr><th class="rank-col" scope="col">#</th><th scope="col">Port</th><th scope="col">Availability</th><th scope="col">WhatsApp</th><th scope="col">Connection history <span class="table-period">7 DAYS</span></th></tr></thead><tbody id="ports"></tbody></table></div>
+      <div id="empty" class="empty" role="status"><span class="loading-mark" aria-hidden="true"></span><h3>Checking your ports</h3><p>Getting the latest connection status.</p></div>
+      <div class="table-footer"><span><span class="dot"></span>Status comes from SoloOne and Whapi</span><span>Connection history · Last 7 days</span></div>
+    </section>
+    <footer class="page-footer"><span>soloone / operations</span><span>Free means unallocated. Check the connection before using a port.</span></footer>
+  </main>
+  <template id="row-template"><tr><td class="rank"></td><td><div class="port-cell"><span class="port-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="3"/><path d="M10 18.5h4"/></svg></span><div><span class="port-name"></span><span class="device" hidden>Real phone</span></div></div></td><td><span class="badge availability"></span></td><td><span class="connection"><span class="status-dot"></span><span class="connection-label"></span></span></td><td><span class="stability"></span></td></tr></template>
+</body>
+</html>
