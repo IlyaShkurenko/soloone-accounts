@@ -1,7 +1,7 @@
 # SoloOne accounts
 
 Small public, read-only port directory. No login or mobile build. Existing port
-accounts only, Free/In use filters, connection status, hidden stability ranking,
+accounts only, Warming/In use/Free filters, connection status, hidden stability ranking,
 and a Real phone badge for port41. No database writes or provider wakeups.
 
 ## Deploy on Vercel
@@ -34,7 +34,11 @@ Open http://localhost:9004. Without `API_BASE`, the proxy uses
 The Node server only serves the three public assets and proxies the read-only API.
 
 The backend owns the `/api/ports` contract. Availability follows existing SoloOne
-mode: `warming` means Free, `ready` means In use. Connection is a separate status.
+mode: `warming` means Warming regardless of connection. In use requires `ready`,
+connected WhatsApp and the same active-person criteria as the KPI dashboard, over
+the last seven UTC calendar days including today. Everything else is Free.
+WhatsApp is Connected only when Whapi confirms AUTH without a block or stop;
+all other states are Disconnected. Provider verification failures remain explicit.
 Ranking uses recent disconnects and retained warmup activity; activity counts are
 not exposed to this frontend.
 Refresh is automatic once per minute. A failed refresh leaves previous data explicitly
@@ -43,6 +47,6 @@ not reserve ports or change their SoloOne status.
 
 ## Verification
 
-`npm run check`, plus browser checks for Free/In use filters, search, empty results,
+`npm run check`, plus browser checks for Warming/In use/Free filters, search, empty results,
 port41 badge, refresh failure and a 390px viewport. Backend tests cover ordering,
-unknown/blocked states, log deduplication and minimal public response projection.
+connection states, log deduplication and minimal public response projection.

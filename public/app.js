@@ -1,6 +1,6 @@
 const $ = selector => document.querySelector(selector)
-const availabilityLabels = { free: 'Free', in_use: 'In use', unknown: 'Not set' }
-const connectionLabels = { connected: 'Connected', disconnected: 'Disconnected', blocked: 'Blocked', starting: 'Disconnected', connection_issue: 'Connection issue', unknown: 'Not verified', not_configured: 'Not configured' }
+const availabilityLabels = { warming: 'Warming', free: 'Free', in_use: 'In use' }
+const connectionLabels = { connected: 'Connected', disconnected: 'Disconnected' }
 const stabilityLabels = { no_recent_disconnects: 'No recent disconnects', recent_disconnects: 'Recent disconnects', untested: 'Not enough activity yet', limited_history: 'Limited history' }
 let snapshot = null
 let fetching = false
@@ -71,11 +71,9 @@ function render() {
   $('#count-in-use').textContent = ports.filter(p => p.availability === 'in_use').length
   $('#count-attention').textContent = ports.filter(p => p.connection !== 'connected').length
   $('#count-all').textContent = ports.length
-  const showFree = $('#filter-free').checked
-  const showInUse = $('#filter-in-use').checked
+  const selected = new Set(Object.keys(availabilityLabels).filter(value => $(`#filter-${value.replace('_', '-')}`).checked))
   const search = $('#search').value.trim().toLowerCase().replace(/^port\s*/, '')
-  const visible = ports.filter(p => ((showFree && p.availability === 'free') || (showInUse && p.availability === 'in_use')
-    || (showFree && showInUse && p.availability === 'unknown')) && String(p.port).includes(search))
+  const visible = ports.filter(p => selected.has(p.availability) && String(p.port).includes(search))
   const fragment = document.createDocumentFragment()
   for (const port of visible) {
     const row = $('#row-template').content.cloneNode(true)
@@ -86,8 +84,8 @@ function render() {
       row.querySelector(selector).textContent = labels[value] || 'Unknown'
       row.querySelector(selector).dataset.state = value
     }
-    row.querySelector('.connection').dataset.state = port.connection === 'starting' ? 'disconnected' : port.connection
-    row.querySelector('.connection-label').textContent = connectionLabels[port.connection] || 'Not verified'
+    row.querySelector('.connection').dataset.state = port.connection
+    row.querySelector('.connection-label').textContent = connectionLabels[port.connection]
     if (port.stability === 'recent_disconnects' || port.disconnectHistory?.count > 0) {
       const help = document.createElement('button')
       help.type = 'button'
@@ -143,7 +141,7 @@ async function refresh() {
     $('#refresh').disabled = false
   }
 }
-for (const id of ['#filter-free', '#filter-in-use', '#search']) $(id).addEventListener('input', render)
+for (const id of ['#filter-warming', '#filter-free', '#filter-in-use', '#search']) $(id).addEventListener('input', render)
 $('#refresh').addEventListener('click', refresh)
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh() })
 setInterval(() => { if (!document.hidden) refresh() }, 60000)
