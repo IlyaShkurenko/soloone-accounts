@@ -6,8 +6,66 @@ let snapshot = null
 let fetching = false
 let refreshFailed = false
 
+const historyTooltip = document.createElement('div')
+historyTooltip.id = 'disconnect-tooltip'
+historyTooltip.className = 'history-tooltip'
+historyTooltip.setAttribute('role', 'tooltip')
+historyTooltip.hidden = true
+document.body.append(historyTooltip)
+let tooltipAnchor = null
+let tooltipTimer
+const historyDate = new Intl.DateTimeFormat('en-GB', {
+  day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', hourCycle: 'h23'
+})
+
+function hideHistory() {
+  clearTimeout(tooltipTimer)
+  tooltipAnchor?.removeAttribute('aria-describedby')
+  tooltipAnchor = null
+  historyTooltip.hidden = true
+}
+
+function showHistory(button, port) {
+  hideHistory()
+  tooltipAnchor = button
+  button.setAttribute('aria-describedby', historyTooltip.id)
+  const details = port.disconnectHistory
+  const count = details?.count
+  const title = document.createElement('strong')
+  title.textContent = typeof count === 'number' ? `${count} ${count === 1 ? 'disconnect' : 'disconnects'} · last 7 days` : 'Disconnect history unavailable'
+  const dates = document.createElement('ul')
+  for (const timestamp of details?.timestamps || []) {
+    const item = document.createElement('li')
+    item.textContent = historyDate.format(new Date(timestamp)) + ' UTC'
+    dates.append(item)
+  }
+  historyTooltip.replaceChildren(title, dates)
+  if (snapshot.historyPartial) {
+    const note = document.createElement('small')
+    note.textContent = 'Partial history · recorded events only'
+    historyTooltip.append(note)
+  }
+  historyTooltip.hidden = false
+  const anchor = button.getBoundingClientRect()
+  const box = historyTooltip.getBoundingClientRect()
+  const left = Math.max(8, Math.min(anchor.right - box.width, innerWidth - box.width - 8))
+  const top = anchor.bottom + box.height + 8 < innerHeight ? anchor.bottom + 7 : Math.max(8, anchor.top - box.height - 7)
+  historyTooltip.style.left = `${left}px`
+  historyTooltip.style.top = `${top}px`
+}
+
+historyTooltip.addEventListener('pointerenter', () => clearTimeout(tooltipTimer))
+historyTooltip.addEventListener('pointerleave', hideHistory)
+document.addEventListener('pointerdown', event => {
+  if (!historyTooltip.contains(event.target) && !event.target.closest('.history-help')) hideHistory()
+})
+document.addEventListener('keydown', event => { if (event.key === 'Escape') hideHistory() })
+window.addEventListener('resize', hideHistory)
+document.addEventListener('scroll', event => { if (!historyTooltip.contains(event.target)) hideHistory() }, true)
+
 function render() {
   if (!snapshot) return
+  hideHistory()
   const ports = snapshot.ports
   $('#count-available').textContent = ports.filter(p => p.availability === 'free' && p.connection === 'connected').length
   $('#count-in-use').textContent = ports.filter(p => p.availability === 'in_use').length
@@ -30,6 +88,19 @@ function render() {
     }
     row.querySelector('.connection').dataset.state = port.connection === 'starting' ? 'disconnected' : port.connection
     row.querySelector('.connection-label').textContent = connectionLabels[port.connection] || 'Not verified'
+    if (port.stability === 'recent_disconnects' || port.disconnectHistory?.count > 0) {
+      const help = document.createElement('button')
+      help.type = 'button'
+      help.className = 'history-help'
+      help.textContent = '?'
+      help.setAttribute('aria-label', `Disconnect history for ${port.label}`)
+      help.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') showHistory(help, port) })
+      help.addEventListener('pointerleave', () => { tooltipTimer = setTimeout(hideHistory, 150) })
+      help.addEventListener('focus', () => showHistory(help, port))
+      help.addEventListener('blur', hideHistory)
+      help.addEventListener('click', () => showHistory(help, port))
+      row.querySelector('.stability').after(help)
+    }
     fragment.append(row)
   }
   $('#ports').replaceChildren(fragment)
