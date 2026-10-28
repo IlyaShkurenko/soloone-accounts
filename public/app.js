@@ -1,6 +1,6 @@
 const $ = selector => document.querySelector(selector)
 const availabilityLabels = { free: 'Free', in_use: 'In use', unknown: 'Not set' }
-const connectionLabels = { connected: 'Connected', disconnected: 'Disconnected', blocked: 'Blocked', starting: 'Connecting', connection_issue: 'Connection issue', unknown: 'Not verified', not_configured: 'Not configured' }
+const connectionLabels = { connected: 'Connected', disconnected: 'Disconnected', blocked: 'Blocked', starting: 'Disconnected', connection_issue: 'Connection issue', unknown: 'Not verified', not_configured: 'Not configured' }
 const stabilityLabels = { no_recent_disconnects: 'No recent disconnects', recent_disconnects: 'Recent disconnects', untested: 'Not enough activity yet', limited_history: 'Limited history' }
 let snapshot = null
 let fetching = false
@@ -28,7 +28,7 @@ function render() {
       row.querySelector(selector).textContent = labels[value] || 'Unknown'
       row.querySelector(selector).dataset.state = value
     }
-    row.querySelector('.connection').dataset.state = port.connection
+    row.querySelector('.connection').dataset.state = port.connection === 'starting' ? 'disconnected' : port.connection
     row.querySelector('.connection-label').textContent = connectionLabels[port.connection] || 'Not verified'
     fragment.append(row)
   }
