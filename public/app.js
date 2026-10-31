@@ -1,6 +1,6 @@
 const $ = selector => document.querySelector(selector)
 const availabilityLabels = { warming: 'Warming', free: 'Free', in_use: 'In use' }
-const connectionLabels = { connected: 'Connected', disconnected: 'Disconnected' }
+const connectionLabels = { connected: 'Connected', disconnected: 'Disconnected', blocked: 'Blocked' }
 const stabilityLabels = { no_recent_disconnects: 'No recent disconnects', recent_disconnects: 'Recent disconnects', untested: 'Not enough activity yet', limited_history: 'Limited history' }
 let snapshot = null
 let fetching = false

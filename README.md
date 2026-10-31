@@ -38,7 +38,8 @@ mode: `warming` means Warming regardless of connection. In use requires `ready`,
 connected WhatsApp and the same active-person criteria as the KPI dashboard, over
 the last seven UTC calendar days including today. Everything else is Free.
 WhatsApp is Connected only when Whapi confirms AUTH without a block or stop;
-all other states are Disconnected. Provider verification failures remain explicit.
+An explicit health reason `banned` or partner block is Blocked; other states are
+Disconnected. Provider verification failures remain explicit.
 Ranking uses recent disconnects and retained warmup activity; activity counts are
 not exposed to this frontend.
 Refresh is automatic once per minute. A failed refresh leaves previous data explicitly
