@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "node --watch server.mjs",
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check public/app.js"
+    "check": "node --check server.mjs && node --check public/app.js",
+    "fails-first": "node scripts/fails-first.mjs",
+    "secret-scan": "node scripts/secret-scan.mjs",
+    "gate": "npm run check && npm run secret-scan"
+  },
+  "config": {
+    "failsFirstCommand": "node --test"
   },
   "engines": { "node": "22.x" }
 }
